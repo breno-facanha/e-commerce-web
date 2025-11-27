@@ -1,23 +1,34 @@
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { DropdownMenu, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { useAuth } from "@/contexts/AuthContext"
 import Image from "next/image"
 import { Button } from "../ui/button"
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
+import { useCookies } from "react-cookie"
 
 export function AdminSidebar(){
-    const [open, setOpen] = useState(false)
     const { user } = useAuth()
+    const [cookies , setCookies] = useCookies(['sidebar'])
+    const [open, setOpen] = useState(false)
+
+    useEffect(() => {
+      setOpen(cookies.sidebar)
+    }, [])
+
+    function handleSwitchSidebar(){
+        setCookies('sidebar', open ? "false" : "true")
+        setOpen(!open)
+    }
 
     return (
         <aside className={cn(
             "border-r bg-[#111418] transition-all durantion-300 border-[#343942]",
-            open ? "w-64" : "w-16"
+            cookies.sidebar ? "w-64" : "w-16"
         )}>
             <div className="border-b p-3 border-[#343942]">
                 <div className={`flex items-center gap-2
-                     ${open ? "justify-between" : "flex-col"}`}>
+                     ${cookies.sidebar ? "justify-between" : "flex-col"}`}>
                     
                     <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
@@ -38,7 +49,7 @@ export function AdminSidebar(){
                                     </button>
                                 )}
 
-                                {open && (
+                                {cookies.sidebar && (
                                     <div className="flex-1 text-left">
                                         <p className="text-sm font-medium">{user?.name}</p>
                                         <p className="text-xs text-[#848E9C]">{user?.email}</p>
@@ -51,10 +62,10 @@ export function AdminSidebar(){
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setOpen(!open)}
-                        className={open ? "h-8 w-8" : "h-7 w-7"}
+                        onClick={handleSwitchSidebar}
+                        className={cookies.sidebar ? "h-8 w-8" : "h-7 w-7"}
                     >
-                        {open ? <LuChevronLeft /> : <LuChevronRight />}
+                        {cookies.sidebar ? <LuChevronLeft /> : <LuChevronRight />}
                     </Button>
                 </div>
             </div>
