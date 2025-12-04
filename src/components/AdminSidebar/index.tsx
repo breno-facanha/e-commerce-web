@@ -6,29 +6,27 @@ import Image from "next/image"
 import { Button } from "../ui/button"
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
 import { useCookies } from "react-cookie"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "@/redux/store"
+import { setSidebarValue } from "@/redux/reducers/sidebarValueSlice"
 
 export function AdminSidebar(){
     const { user } = useAuth()
-    const [cookies , setCookies] = useCookies(['sidebar'])
-    const [open, setOpen] = useState(false)
-
-    useEffect(() => {
-      setOpen(cookies.sidebar)
-    }, [])
+    const open = useSelector((state: RootState) => state.sidebarValue.open )
+    const dispatch = useDispatch()
 
     function handleSwitchSidebar(){
-        setCookies('sidebar', open ? "false" : "true")
-        setOpen(!open)
+       dispatch(setSidebarValue(!open))
     }
 
     return (
         <aside className={cn(
             "border-r bg-[#111418] transition-all durantion-300 border-[#343942]",
-            cookies.sidebar ? "w-64" : "w-16"
+            open ? "w-64" : "w-16"
         )}>
             <div className="border-b p-3 border-[#343942]">
                 <div className={`flex items-center gap-2
-                     ${cookies.sidebar ? "justify-between" : "flex-col"}`}>
+                     ${open ? "justify-between" : "flex-col"}`}>
                     
                     <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
@@ -49,7 +47,7 @@ export function AdminSidebar(){
                                     </button>
                                 )}
 
-                                {cookies.sidebar && (
+                                {open && (
                                     <div className="flex-1 text-left">
                                         <p className="text-sm font-medium">{user?.name}</p>
                                         <p className="text-xs text-[#848E9C]">{user?.email}</p>
@@ -63,9 +61,9 @@ export function AdminSidebar(){
                         variant="ghost"
                         size="icon"
                         onClick={handleSwitchSidebar}
-                        className={cookies.sidebar ? "h-8 w-8" : "h-7 w-7"}
+                        className={open ? "h-8 w-8" : "h-7 w-7"}
                     >
-                        {cookies.sidebar ? <LuChevronLeft /> : <LuChevronRight />}
+                        {open ? <LuChevronLeft /> : <LuChevronRight />}
                     </Button>
                 </div>
             </div>
